@@ -44,3 +44,18 @@ You don’t have to ever use `eject`. The curated feature set is suitable for sm
 You can learn more in the [Create React App documentation](https://facebook.github.io/create-react-app/docs/getting-started).
 
 To learn React, check out the [React documentation](https://reactjs.org/).
+
+## React Typescript example
+
+### env config script:
+
+2. yarn create-react-app `project name` --template typescript
+3. yarn add --dev typescript
+4. yarn run tsc --init
+5. in tsconfig.json
+   "compilerOptions": {
+   "rootDir": "src",
+   "outDir": "build"
+   },
+6. yarn add --dev @types/react
+7. yarn add prettier prettier-eslint (auto save with eslint)
