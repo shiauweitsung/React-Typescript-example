@@ -45,7 +45,7 @@ export const counterSlice = createSlice({
   },
   extraReducers: (builder) => {
     builder.addCase(fetchPokemo.fulfilled, (state, action) => {
-      console.log(state, action, 'state, action');
+      // console.log(state, action, 'state, action');
     });
   },
 });
