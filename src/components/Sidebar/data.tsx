@@ -1,6 +1,7 @@
 import { ReactComponent as HomeSvg } from 'assets/images/icons/home.svg';
 import { ReactComponent as StoreSvg } from 'assets/images/icons/book.svg';
-import { ReactNode, SVGProps } from 'react';
+import { ReactComponent as FromSvg } from 'assets/images/icons/form.svg';
+import { ReactNode } from 'react';
 
 type ISidebarData = {
   label: string;
@@ -18,6 +19,11 @@ export const sidebarData: ISidebarData[] = [
     label: 'Store',
     link: '/counter',
     icon: <StoreSvg />,
+  },
+  {
+    label: 'Formik',
+    link: '/formik',
+    icon: <FromSvg />,
   },
 ];
 
