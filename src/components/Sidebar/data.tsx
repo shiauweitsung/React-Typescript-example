@@ -25,6 +25,11 @@ export const sidebarData: ISidebarData[] = [
     link: '/formik',
     icon: <FromSvg />,
   },
+  {
+    label: 'ScanQRCode',
+    link: '/scan',
+    icon: <FromSvg />,
+  },
 ];
 
 export default sidebarData;
