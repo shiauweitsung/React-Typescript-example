@@ -1,3 +1,4 @@
+import { GoogleOAuthProvider } from '@react-oauth/google';
 import { Route, Routes, Navigate } from 'react-router-dom';
 import Sidebar from 'components/Sidebar';
 import Home from 'pages/Home';
@@ -6,7 +7,7 @@ import FormikForm from 'pages/Formik';
 import ScanQRcode from 'pages/ScanQRcode';
 import EChart from 'pages/EChart';
 import GoogleLoginPage from 'pages/Google';
-import { GoogleOAuthProvider } from '@react-oauth/google';
+import ChatRoom from 'pages/ChatRoom';
 
 function App() {
   return (
@@ -20,6 +21,7 @@ function App() {
           <Route path="scan" element={<ScanQRcode />} />
           <Route path="echart" element={<EChart />} />
           <Route path="google" element={<GoogleLoginPage />} />
+          <Route path="chat" element={<ChatRoom />} />
         </Routes>
         <Sidebar />
       </GoogleOAuthProvider>

@@ -1,5 +1,15 @@
 @import 'styles/elements/color';
 
+@font-face {
+  font-family: 'VT323';
+  src: url('../fonts/VT323-Regular.ttf') format("truetype");
+}
+
+@font-face {
+  font-family: 'Rubik Vinyl';
+  src: url('../fonts/RubikVinyl-Regular.ttf') format("truetype");
+}
+
 html,
 body,
 div,
@@ -107,6 +117,7 @@ section {
 body {
   line-height: 1;
   background-color: $main;
+  min-height: auto;
 }
 
 ol,
@@ -159,4 +170,13 @@ h4 {
 
 #root {
   margin-left: 200px;
+}
+
+input:-webkit-autofill,
+input:-webkit-autofill:hover,
+input:-webkit-autofill:focus,
+input:-webkit-autofill:active {
+  background-color: transparent;
+  -webkit-box-shadow: 0 0 0 1000px rgba(255, 255, 255, 0) inset;
+  transition: background-color 5000s ease-in-out 0s;
 }

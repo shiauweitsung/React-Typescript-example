@@ -32,7 +32,7 @@ let allUsers = []; // All users in current chat room
 // Listen for when the client connects via socket.io-client
 io.on('connection', (socket) => {
     console.log(`User connected ${socket.id}`);
-
+    let __createdtime__ = Date.now(); // Current timestamp
     // We can write our socket event listeners in here...
 
     socket.on('join_room', (data) => {
@@ -41,18 +41,18 @@ io.on('connection', (socket) => {
         console.log(room, 'room');
         socket.join(room); // Join the user to a socket room
 
-        let __createdtime__ = Date.now(); // Current timestamp
+
         // Send message to all users currently in the room, apart from the user that just joined
         io.to(room).emit('receive_message', {
             message: `${name} has joined the chat room`,
-            username: CHAT_BOT,
+            name: CHAT_BOT,
             __createdtime__,
         });
 
         // Send welcome msg to user that just joined chat only
         socket.emit('receive_message', {
             message: `Welcome ${name}`,
-            username: CHAT_BOT,
+            name: CHAT_BOT,
             __createdtime__,
         });
         // Save the new user to the room
@@ -67,6 +67,14 @@ io.on('connection', (socket) => {
     socket.on('message', (data) => {
         console.log(data, 'message');
         socket.emit('messageResponse', data)
+        if (data.message === 'test') {
+            console.log('return test');
+            socket.emit('receive_message', {
+                message: `u say test`,
+                name: CHAT_BOT,
+                __createdtime__,
+            });
+        }
     });
 
     // leave room

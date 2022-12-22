@@ -4,6 +4,7 @@ import { ReactComponent as FormSvg } from 'assets/images/icons/form.svg';
 import { ReactComponent as QrCodeSvg } from 'assets/images/icons/qrCode.svg';
 import { ReactComponent as ChartSvg } from 'assets/images/icons/chart.svg';
 import { ReactComponent as GoogleSvg } from 'assets/images/icons/google.svg';
+import { ReactComponent as ChatSvg } from 'assets/images/icons/chat.svg';
 
 import { ReactNode } from 'react';
 
@@ -43,6 +44,11 @@ export const sidebarData: ISidebarData[] = [
     label: 'Google',
     link: '/google',
     icon: <GoogleSvg />,
+  },
+  {
+    label: 'ChatRoom',
+    link: '/chat',
+    icon: <ChatSvg />,
   },
 ];
 
