@@ -5,6 +5,7 @@ const cors = require('cors');
 const { Server } = require('socket.io');
 const { NlpManager } = require('node-nlp');
 const manager = new NlpManager({ languages: ['en'] });
+const { dockStart } = require('@nlpjs/basic');
 const leaveRoom = require('./utils/leave-room');
 
 const corsOptions = {
@@ -55,7 +56,8 @@ async function trainChatBotIA() {
         resolve(true);
     })
 }
-trainChatBotIA();
+// trainChatBotIA();
+
 async function generateResponseAI(qsm) {
     // Train and save the mode
     return new Promise(async (resolve, reject) => {
@@ -65,10 +67,15 @@ async function generateResponseAI(qsm) {
 }
 
 // Listen for when the client connects via socket.io-client
-io.on('connection', (socket) => {
+io.on('connection', async (socket) => {
     console.log(`User connected ${socket.id}`);
     let __createdtime__ = Date.now(); // Current timestamp
     // We can write our socket event listeners in here...
+
+    // get robot ai text
+    const dock = await dockStart({ use: ['Basic'] });
+    const nlp = dock.get('nlp');
+    await nlp.train();
 
     socket.on('join_room', (data) => {
         console.log(data, 'emit join room');
@@ -102,7 +109,9 @@ io.on('connection', (socket) => {
     socket.on('message', async (data) => {
         console.log(data, 'message');
         socket.emit('messageResponse', data);
-        let response = await generateResponseAI(data.message);
+        // let response = await generateResponseAI(data.message);
+        const response = await nlp.process('en', data.message);
+
         console.log(response, 'response');
         socket.emit('receive_message', response.answer !== undefined ? {
             message: response.answer,

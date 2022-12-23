@@ -1,0 +1,10 @@
+{
+    "settings": {
+      "nlp": {
+        "corpora": [
+          "./corpus_en.json"
+        ]
+      }
+    },
+    "use": ["Basic"]
+}
