@@ -8,6 +8,7 @@ import ScanQRcode from 'pages/ScanQRcode';
 import EChart from 'pages/EChart';
 import GoogleLoginPage from 'pages/Google';
 import ChatRoom from 'pages/ChatRoom';
+import AnimalHospital from 'pages/AnimalHospital';
 
 function App() {
   return (
@@ -22,6 +23,7 @@ function App() {
           <Route path="echart" element={<EChart />} />
           <Route path="google" element={<GoogleLoginPage />} />
           <Route path="chat" element={<ChatRoom />} />
+          <Route path="animal_hospital" element={<AnimalHospital />} />
         </Routes>
         <Sidebar />
       </GoogleOAuthProvider>
