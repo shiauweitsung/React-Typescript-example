@@ -1,6 +1,7 @@
 {
   "name": "react-typescript-example",
   "version": "0.1.0",
+  "homepage": "https://shiauweitsung.github.io/react_typescript_example",
   "private": true,
   "dependencies": {
     "@donnikitos/react-clickaway": "^1.0.0",
@@ -22,6 +23,7 @@
     "echarts-for-react": "^3.0.2",
     "eslint": "^8.0.1",
     "formik": "^2.2.9",
+    "gh-pages": "^4.0.0",
     "i18next": "^22.0.5",
     "i18next-browser-languagedetector": "^7.0.1",
     "i18next-http-backend": "^2.0.1",
@@ -49,7 +51,9 @@
     "start": "react-scripts start",
     "build": "react-scripts build",
     "test": "react-scripts test",
-    "eject": "react-scripts eject"
+    "eject": "react-scripts eject",
+    "predeploy": "npm run build", 
+    "deploy": "gh-pages -d build"
   },
   "browserslist": {
     "production": [
