@@ -1,7 +1,7 @@
 {
   "name": "react-typescript-example",
   "version": "0.1.0",
-  "homepage": "https://shiauweitsung.github.io/react_typescript_example",
+  "homepage": "https://shiauweitsung.github.io/React-Typescript-example",
   "private": true,
   "dependencies": {
     "@donnikitos/react-clickaway": "^1.0.0",
