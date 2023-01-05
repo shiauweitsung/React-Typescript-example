@@ -12,6 +12,7 @@ const corsOptions = {
     origin: [
         'http://localhost:4000',
         'http://localhost:4000/chat',
+        'https://shiauweitsung.github.io/',
     ],
     methods: 'GET,HEAD,PUT,PATCH,POST,DELETE,OPTIONS',
     allowedHeaders: ['Content-Type', 'Authorization'],
