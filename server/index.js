@@ -1,145 +1,49 @@
 const express = require('express');
-const app = express();
-const http = require('http');
+const dotenv = require('dotenv');
 const cors = require('cors');
-const { Server } = require('socket.io');
-const { NlpManager } = require('node-nlp');
-const manager = new NlpManager({ languages: ['en'] });
-const { dockStart } = require('@nlpjs/basic');
-const leaveRoom = require('./utils/leave-room');
+const { Configuration, OpenAIApi } = require('openai');
 
-const corsOptions = {
-    origin: [
-        'http://localhost:4000',
-        'http://localhost:4000/chat',
-        'https://shiauweitsung.github.io/',
-    ],
-    methods: 'GET,HEAD,PUT,PATCH,POST,DELETE,OPTIONS',
-    allowedHeaders: ['Content-Type', 'Authorization'],
-};
 
-app.use(cors(corsOptions)); // Add cors middleware
+dotenv.config()
 
-const server = http.createServer(app);
-
-const io = new Server(server, {
-    cors: {
-        origin: 'http://localhost:4000',
-        methods: ['GET', 'POST'],
-    },
+const configuration = new Configuration({
+    apiKey: process.env.OPENAI_API_KEY,
 });
 
-const CHAT_BOT = 'ChatBot';
-let chatRoom = ''; // E.g. javascript, node,...
-let allUsers = []; // All users in current chat room
+const openai = new OpenAIApi(configuration);
 
-async function trainChatBotIA() {
-    return new Promise(async (resolve, reject) => {
-        // Adds the utterances and intents for the NLP
-        // // Train also the NLG
-        // Adds the utterances and intents for the NLP
-        manager.addDocument('en', 'goodbye for now', 'greetings.bye');
-        manager.addDocument('en', 'bye bye take care', 'greetings.bye');
-        manager.addDocument('en', 'okay see you later', 'greetings.bye');
-        manager.addDocument('en', 'bye for now', 'greetings.bye');
-        manager.addDocument('en', 'i must go', 'greetings.bye');
-        manager.addDocument('en', 'hello', 'greetings.hello');
-        manager.addDocument('en', 'hi', 'greetings.hello');
-        manager.addDocument('en', 'howdy', 'greetings.hello');
-        // Train also the NLG
-        manager.addAnswer('en', 'greetings.bye', 'Till next time');
-        manager.addAnswer('en', 'greetings.bye', 'see you soon!');
-        manager.addAnswer('en', 'greetings.hello', 'Hey there!');
-        manager.addAnswer('en', 'greetings.hello', 'Greetings!');
-        await manager.train();
-        manager.save();
-        console.log("AI has been trainded")
-        resolve(true);
+const app = express()
+app.use(cors())
+app.use(express.json())
+
+app.get('/', async (req, res) => {
+    res.status(200).send({
+        message: 'Hello from CodeX!'
     })
-}
-// trainChatBotIA();
+})
 
-async function generateResponseAI(qsm) {
-    // Train and save the mode
-    return new Promise(async (resolve, reject) => {
-        response = await manager.process('en', qsm);
-        resolve(response);
-    })
-}
+app.post('/', async (req, res) => {
+    try {
+        const prompt = req.body.prompt;
 
-// Listen for when the client connects via socket.io-client
-io.on('connection', async (socket) => {
-    console.log(`User connected ${socket.id}`);
-    let __createdtime__ = Date.now(); // Current timestamp
-    // We can write our socket event listeners in here...
-
-    // get robot ai text
-    const dock = await dockStart({ use: ['Basic'] });
-    const nlp = dock.get('nlp');
-    await nlp.train();
-
-    socket.on('join_room', (data) => {
-        console.log(data, 'emit join room');
-        const { name, room } = data; // Data sent from client when join_room event emitted
-        console.log(room, 'room');
-        socket.join(room); // Join the user to a socket room
-
-
-        // Send message to all users currently in the room, apart from the user that just joined
-        io.to(room).emit('receive_message', {
-            message: `${name} has joined the chat room`,
-            name: CHAT_BOT,
-            __createdtime__,
+        const response = await openai.createCompletion({
+            model: "text-davinci-003",
+            prompt: `${prompt}`,
+            temperature: 0, // Higher values means the model will take more risks.
+            max_tokens: 3000, // The maximum number of tokens to generate in the completion. Most models have a context length of 2048 tokens (except for the newest models, which support 4096).
+            top_p: 1, // alternative to sampling with temperature, called nucleus sampling
+            frequency_penalty: 0.5, // Number between -2.0 and 2.0. Positive values penalize new tokens based on their existing frequency in the text so far, decreasing the model's likelihood to repeat the same line verbatim.
+            presence_penalty: 0, // Number between -2.0 and 2.0. Positive values penalize new tokens based on whether they appear in the text so far, increasing the model's likelihood to talk about new topics.
         });
 
-        // Send welcome msg to user that just joined chat only
-        socket.emit('receive_message', {
-            message: `Welcome ${name}`,
-            name: CHAT_BOT,
-            __createdtime__,
+        res.status(200).send({
+            bot: response.data.choices[0].text
         });
-        // Save the new user to the room
-        // chatRoom = room;
-        // allUsers.push({ id: socket.id, name, room });
-        // chatRoomUsers = allUsers.filter((user) => user.room === room);
-        // socket.to(room).emit('chatroom_users', chatRoomUsers);
-        // socket.emit('chatroom_users', chatRoomUsers);
 
-    });
-    // send message
-    socket.on('message', async (data) => {
-        console.log(data, 'message');
-        socket.emit('messageResponse', data);
-        // let response = await generateResponseAI(data.message);
-        const response = await nlp.process('en', data.message);
+    } catch (error) {
+        console.error(error)
+        res.status(500).send(error || 'Something went wrong');
+    }
+})
 
-        console.log(response, 'response');
-        socket.emit('receive_message', response.answer !== undefined ? {
-            message: response.answer,
-            name: CHAT_BOT,
-            __createdtime__,
-        } : {
-            message: `I don't understand`,
-            name: CHAT_BOT,
-            __createdtime__,
-        })
-    });
-
-    // leave room
-    socket.on('leave_room', (data) => {
-        const { name, room } = data;
-        socket.leave(room);
-        const __createdtime__ = Date.now();
-        // Remove user from memory
-        // allUsers = leaveRoom(socket.id, allUsers);
-        // socket.to(room).emit('chatroom_users', allUsers);
-        // socket.to(room).emit('receive_message', {
-        //     username: CHAT_BOT,
-        //     message: `${name} has left the chat`,
-        //     __createdtime__,
-        // });
-        // console.log(`${name} has left the chat`);
-    });
-});
-
-server.listen(5050, () => 'Server is running on port 5050');
+app.listen(5050, () => console.log('AI server started on http://localhost:5050'))
