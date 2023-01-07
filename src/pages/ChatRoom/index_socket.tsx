@@ -8,7 +8,8 @@ import { Fragment, useEffect, useRef, useState } from 'react';
 import { ReactComponent as RobotSvg } from 'assets/images/icons/robot.svg';
 import { ReactComponent as RobotAvatarSvg } from 'assets/images/icons/robot_avatar.svg';
 import { ReactComponent as BackSvg } from 'assets/images/icons/back.svg';
-import axios from 'axios';
+
+const socket = io('http://localhost:5050');
 
 type IReceiveMsg = {
   message: string;
@@ -28,13 +29,33 @@ export default function ChatRoom() {
   const contentRefs = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
-    (async () => {
-      const response = axios.post('http://localhost:5050/', {
-        prompt: 'hello', // message
-      });
-      console.log(response, 'response');
-    })();
-  }, []);
+    socket.on('receive_message', (data) => {
+      setMessages((state) => [
+        ...state,
+        {
+          message: data.message,
+          name: data.name,
+          __createdtime__: data.__createdtime__,
+        },
+      ]);
+    });
+    socket.on('messageResponse', (data) => {
+      setMessages((state) => [
+        ...state,
+        {
+          message: data.message,
+          name: data.name,
+          __createdtime__: data.__createdtime__,
+        },
+      ]);
+    });
+
+    // Remove event listener on component unmount
+    return () => {
+      socket.off('receive_message');
+      socket.off('messageResponse');
+    };
+  }, [socket]);
 
   useEffect(() => {
     if (contentRefs.current) {
@@ -53,12 +74,20 @@ export default function ChatRoom() {
       const { name } = values;
       const room = 'default';
       if (name !== '') {
+        socket.emit('join_room', { name, room });
         setLoginState(true);
       }
     },
   });
 
   const sendMessage = () => {
+    socket.emit('message', {
+      message: formik.values.message,
+      name: formik.values.name,
+      id: `${socket.id}${Math.random()}`,
+      socketID: socket.id,
+      __createdtime__: Date.now(),
+    });
     formik.setFieldValue('message', '');
   };
 
@@ -66,7 +95,7 @@ export default function ChatRoom() {
     const __createdtime__ = Date.now();
     const name = formik.values.name;
     const room = 'default';
-
+    socket.emit('leave_room', { name, room, __createdtime__ });
     setLoginState(false);
     formik.setFieldValue('name', '');
     setMessages([]);
