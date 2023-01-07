@@ -1,6 +1,5 @@
 import styles from './styles.module.scss';
 import Scrollbars from 'react-custom-scrollbars-2';
-import { io } from 'socket.io-client';
 import Button from 'components/Button';
 import InputField from 'components/InputField';
 import { useFormik } from 'formik';
@@ -13,7 +12,7 @@ import axios from 'axios';
 type IReceiveMsg = {
   message: string;
   name: string;
-  __createdtime__: Date;
+  __createdtime__: Date | number;
   // id?: number;
 };
 
@@ -26,21 +25,35 @@ export default function ChatRoom() {
   const [loginState, setLoginState] = useState<boolean>(false);
   const [messages, setMessages] = useState<IReceiveMsg[]>([]);
   const contentRefs = useRef<HTMLDivElement>(null);
-
-  useEffect(() => {
-    (async () => {
-      const response = axios.post('http://localhost:5050/', {
-        prompt: 'hello', // message
-      });
-      console.log(response, 'response');
-    })();
-  }, []);
-
+  
   useEffect(() => {
     if (contentRefs.current) {
       contentRefs.current?.scrollIntoView({ block: 'end', behavior: 'smooth' });
     }
+    console.log('message');
+    
   }, [messages]);
+
+  useEffect(() => {
+    (async () => {
+      // const response = axios.post('http://localhost:5050', {
+      //   prompt: 'hello', // message
+      // });
+      const response = axios.get('http://localhost:5050').then((res)=>{
+        setMessages((state) => [
+          ...state,
+          {
+            message:res.data.message,
+            name:'bot',
+            __createdtime__:Date.now(),
+          },
+        ]);
+      });
+      console.log(response, 'response');
+    })();
+    console.log('response');
+
+  }, []);
 
   const formik = useFormik({
     initialValues: {
@@ -49,6 +62,7 @@ export default function ChatRoom() {
       message: '',
     },
     onSubmit: (values) => {
+      // login root
       //   console.log(values, 'values');
       const { name } = values;
       const room = 'default';
@@ -59,6 +73,31 @@ export default function ChatRoom() {
   });
 
   const sendMessage = () => {
+    const message = formik.values.message;
+    const name = formik.values.name;
+    const createdtime = Date.now();
+    setMessages((state) => [
+      ...state,
+      {
+        message,
+        name,
+        __createdtime__:createdtime,
+      },
+    ]);
+    const response = axios.post('http://localhost:5050', {
+      prompt: message, // message
+    }).then((res)=>{
+      const time = Date.now();
+      setMessages((state) => [
+        ...state,
+        {
+          message:res.data.bot,
+          name:'bot',
+          __createdtime__:time,
+        },
+      ]);
+    })
+
     formik.setFieldValue('message', '');
   };
 
@@ -66,7 +105,7 @@ export default function ChatRoom() {
     const __createdtime__ = Date.now();
     const name = formik.values.name;
     const room = 'default';
-
+    
     setLoginState(false);
     formik.setFieldValue('name', '');
     setMessages([]);
