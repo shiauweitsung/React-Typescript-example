@@ -8,6 +8,8 @@ import { ReactComponent as RobotSvg } from 'assets/images/icons/robot.svg';
 import { ReactComponent as RobotAvatarSvg } from 'assets/images/icons/robot_avatar.svg';
 import { ReactComponent as BackSvg } from 'assets/images/icons/back.svg';
 import axios from 'axios';
+import TypingMsg from 'components/TypingMsg';
+import hasWhiteSpace from 'utils/hasWhiteSpace';
 
 type IReceiveMsg = {
   message: string;
@@ -24,36 +26,37 @@ type IReceiveMsg = {
 export default function ChatRoom() {
   const [loginState, setLoginState] = useState<boolean>(false);
   const [messages, setMessages] = useState<IReceiveMsg[]>([]);
+  const [typingMsg, setTypingMsg] = useState<boolean>(false);
   const contentRefs = useRef<HTMLDivElement>(null);
-  
+
   useEffect(() => {
     if (contentRefs.current) {
       contentRefs.current?.scrollIntoView({ block: 'end', behavior: 'smooth' });
     }
     console.log('message');
-    
   }, [messages]);
 
   useEffect(() => {
     (async () => {
-      // const response = axios.post('http://localhost:5050', {
+      // const response = axios.post('https://robotchat.onrender.com/', {
       //   prompt: 'hello', // message
       // });
-      const response = axios.get('http://localhost:5050').then((res)=>{
-        setMessages((state) => [
-          ...state,
-          {
-            message:res.data.message,
-            name:'bot',
-            __createdtime__:Date.now(),
-          },
-        ]);
-      });
-      console.log(response, 'response');
+      if (loginState) {
+        const response = axios
+          .get('https://robotchat.onrender.com/')
+          .then((res) => {
+            setMessages((state) => [
+              ...state,
+              {
+                message: res.data.message,
+                name: 'bot',
+                __createdtime__: Date.now(),
+              },
+            ]);
+          });
+      }
     })();
-    console.log('response');
-
-  }, []);
+  }, [loginState]);
 
   const formik = useFormik({
     initialValues: {
@@ -76,36 +79,50 @@ export default function ChatRoom() {
     const message = formik.values.message;
     const name = formik.values.name;
     const createdtime = Date.now();
+    if (hasWhiteSpace(message)) return;
+    setTypingMsg(true);
     setMessages((state) => [
       ...state,
       {
         message,
         name,
-        __createdtime__:createdtime,
+        __createdtime__: createdtime,
       },
     ]);
-    const response = axios.post('http://localhost:5050', {
-      prompt: message, // message
-    }).then((res)=>{
-      const time = Date.now();
-      setMessages((state) => [
-        ...state,
-        {
-          message:res.data.bot,
-          name:'bot',
-          __createdtime__:time,
-        },
-      ]);
-    })
+    const response = axios
+      .post('https://robotchat.onrender.com/', {
+        prompt: message, // message
+      })
+      .then((res) => {
+        const time = Date.now();
+        setMessages((state) => [
+          ...state,
+          {
+            message: res.data.bot,
+            name: 'bot',
+            __createdtime__: time,
+          },
+        ]);
+      })
+      .catch((error) => {
+        const time = Date.now();
+        setMessages((state) => [
+          ...state,
+          {
+            message: error.response.statusText,
+            name: 'bot',
+            __createdtime__: time,
+          },
+        ]);
+      })
+      .finally(() => {
+        setTypingMsg(false);
+      });
 
     formik.setFieldValue('message', '');
   };
 
   const leaveRoom = () => {
-    const __createdtime__ = Date.now();
-    const name = formik.values.name;
-    const room = 'default';
-    
     setLoginState(false);
     formik.setFieldValue('name', '');
     setMessages([]);
@@ -174,11 +191,21 @@ export default function ChatRoom() {
                   </div>
                 );
               })}
+            {typingMsg && (
+              <div className={styles.receiveUser}>
+                <div>
+                  <div className={styles.img}>
+                    <RobotSvg />
+                  </div>
+                  <div className={styles.msg}>{<TypingMsg />}</div>
+                </div>
+              </div>
+            )}
           </div>
         </Scrollbars>
         <div className={styles.send_Wrap}>
           <InputField
-            onKeyDown={(e) => {
+            onKeyUp={(e) => {
               if (e.key === 'Enter') {
                 sendMessage();
               }
