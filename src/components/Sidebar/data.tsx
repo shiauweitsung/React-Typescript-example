@@ -55,6 +55,16 @@ export const sidebarData: ISidebarData[] = [
     link: '/animal_hospital',
     icon: <ChatSvg />,
   },
+  {
+    label: 'Cookie',
+    link: '/cookie',
+    icon: <ChatSvg />,
+  },
+  {
+    label: 'Table',
+    link: '/table',
+    icon: <ChatSvg />,
+  },
 ];
 
 export default sidebarData;

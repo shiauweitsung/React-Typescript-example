@@ -1,5 +1,7 @@
 import { GoogleOAuthProvider } from '@react-oauth/google';
 import { Route, Routes, Navigate } from 'react-router-dom';
+import { CookiesProvider } from 'react-cookie';
+import { QueryClient, QueryClientProvider } from 'react-query';
 import Sidebar from 'components/Sidebar';
 import Home from 'pages/Home';
 import Counter from 'pages/Counter';
@@ -9,24 +11,37 @@ import EChart from 'pages/EChart';
 import GoogleLoginPage from 'pages/Google';
 import ChatRoom from 'pages/ChatRoom';
 import AnimalHospital from 'pages/AnimalHospital';
+import CookiePage from 'pages/Cookie';
+import Tables from 'pages/Table';
+import TablePagination from 'pages/Table/Paginations';
+
+const queryClient = new QueryClient();
 
 function App() {
   return (
     <>
-      <GoogleOAuthProvider clientId="289230852689-959frpan214vuskh6irl76aihq73u8pm.apps.googleusercontent.com">
-        <Routes>
-          <Route index element={<Home />} />
-          <Route path="*" element={<Navigate to="/" replace />} />
-          <Route path="counter" element={<Counter />} />
-          <Route path="formik" element={<FormikForm />} />
-          <Route path="scan" element={<ScanQRcode />} />
-          <Route path="echart" element={<EChart />} />
-          <Route path="google" element={<GoogleLoginPage />} />
-          <Route path="chat" element={<ChatRoom />} />
-          <Route path="animal_hospital" element={<AnimalHospital />} />
-        </Routes>
-        <Sidebar />
-      </GoogleOAuthProvider>
+      <CookiesProvider>
+        <GoogleOAuthProvider clientId="289230852689-959frpan214vuskh6irl76aihq73u8pm.apps.googleusercontent.com">
+          <QueryClientProvider client={queryClient}>
+            <Routes>
+              <Route index element={<Home />} />
+              <Route path="*" element={<Navigate to="/" replace />} />
+              <Route path="counter" element={<Counter />} />
+              <Route path="formik" element={<FormikForm />} />
+              <Route path="scan" element={<ScanQRcode />} />
+              <Route path="echart" element={<EChart />} />
+              <Route path="google" element={<GoogleLoginPage />} />
+              <Route path="chat" element={<ChatRoom />} />
+              <Route path="animal_hospital" element={<AnimalHospital />} />
+              <Route path="cookie" element={<CookiePage />} />
+              <Route path="table" element={<Tables />}>
+                <Route path="pagination" element={<TablePagination />} />
+              </Route>
+            </Routes>
+            <Sidebar />
+          </QueryClientProvider>
+        </GoogleOAuthProvider>
+      </CookiesProvider>
     </>
   );
 }

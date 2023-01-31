@@ -23,11 +23,11 @@ module.exports = {
     "@typescript-eslint/no-use-before-define": ["error"],
     "react/jsx-filename-extension": ["warn", { "extensions": [".tsx"] }],
     // no use vars off
-    'no-unused-vars': 'off',
+    "no-unused-vars": "off",
     // use function()  no function ()
-    'space-before-function-paren': 0,
+    "space-before-function-paren": 0,
     // 三元運算子 可以換行
-    'multiline-ternary': 1,
+    "multiline-ternary": 1,
     // no import React , don't show error
     "react/react-in-jsx-scope": "off",
     "linebreak-style": ["error", "unix"],
