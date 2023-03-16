@@ -65,6 +65,16 @@ export const sidebarData: ISidebarData[] = [
     link: '/table',
     icon: <ChatSvg />,
   },
+  {
+    label: 'Export',
+    link: '/export_excel',
+    icon: <ChatSvg />,
+  },
+  {
+    label: 'Swiper',
+    link: '/swiper',
+    icon: <ChatSvg />,
+  },
 ];
 
 export default sidebarData;

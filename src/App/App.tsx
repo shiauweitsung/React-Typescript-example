@@ -14,6 +14,8 @@ import AnimalHospital from 'pages/AnimalHospital';
 import CookiePage from 'pages/Cookie';
 import Tables from 'pages/Table';
 import TablePagination from 'pages/Table/Paginations';
+import ExportToExcel from 'pages/Excel';
+import Swipers from 'pages/Swiper';
 
 const queryClient = new QueryClient();
 
@@ -37,6 +39,8 @@ function App() {
               <Route path="table" element={<Tables />}>
                 <Route path="pagination" element={<TablePagination />} />
               </Route>
+              <Route path="export_excel" element={<ExportToExcel />} />
+              <Route path="swiper" element={<Swipers />} />
             </Routes>
             <Sidebar />
           </QueryClientProvider>

@@ -1,12 +1,16 @@
 import { useMemo, useState } from 'react';
 import Button from 'components/Button';
-import { useEffect } from 'react';
+import { useEffect, useRef } from 'react';
 import { useTranslation } from 'react-i18next';
 import { increment, decrement } from 'store/counterSlice';
 import { useAppDispatch } from 'store/hook';
+import ReactDatePicker from 'react-datepicker';
 
 export function Home() {
   const [count, setCount] = useState<number>(0);
+  const [dateRange, setDateRange] = useState<any>([null, null]);
+  const inputRef = useRef(null);
+  const [startDate, endDate] = dateRange;
   const dispatch = useAppDispatch();
 
   const { t, i18n } = useTranslation();
@@ -58,6 +62,22 @@ export function Home() {
       >
         切換中文
       </Button>
+      <ReactDatePicker
+        selectsRange={true}
+        // selected={startDate}
+        startDate={startDate}
+        endDate={endDate}
+        placeholderText="Date range"
+        onChange={(update) => {
+          console.log(update, 'update');
+          setDateRange(update);
+        }}
+        customInput={
+          <>
+            <input type="text" ref={inputRef} />
+          </>
+        }
+      />
     </div>
   );
 }

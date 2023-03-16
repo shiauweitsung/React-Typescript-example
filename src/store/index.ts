@@ -1,11 +1,13 @@
 import { configureStore } from '@reduxjs/toolkit';
 import counterSlice from './counterSlice';
 import { pokemonApi } from './pokemoApi';
+import loadingSlice from './loading';
 
 export const store = configureStore({
   reducer: {
     [counterSlice.name]: counterSlice.reducer,
     [pokemonApi.reducerPath]: pokemonApi.reducer,
+    [loadingSlice.name]: loadingSlice.reducer,
   },
   middleware: (getDefaultMiddleware) =>
     getDefaultMiddleware().concat(

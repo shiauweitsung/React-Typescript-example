@@ -1,0 +1,181 @@
+'use client';
+
+import React, { useContext, useState, useEffect, useMemo } from 'react';
+import type {
+	ConnectOptions,
+	WalletState,
+	DisconnectOptions,
+} from '@web3-onboard/core';
+import { useConnectWallet, useWallets } from '@web3-onboard/react';
+import delay from 'utils/delay';
+import userSlice from 'store/user';
+import { useAppDispatch } from 'store/hook';
+import { userWalletToken, connectedWalletList, isSignState } from 'store/user';
+import IWalletToken from 'constants/interfaces/wallet-tokens';
+import { useCookies } from 'react-cookie';
+import { useRouter } from 'next/navigation';
+
+interface ContextData {
+	data?: any;
+	isSigned?: any;
+}
+
+const ConnectedWalletContext = React.createContext<ContextData>({});
+
+const autoConnect = async (
+	prevConnectedWallets: any,
+	connect: (options?: ConnectOptions) => Promise<WalletState[]>,
+	onComplete: () => void,
+) => {
+	await delay(100);
+	if (prevConnectedWallets?.length) {
+		for (const walletLabel of prevConnectedWallets.reverse()) {
+			await connect({
+				autoSelect: {
+					label: walletLabel,
+					disableModals: true,
+				},
+			});
+		}
+	}
+
+	onComplete();
+};
+
+export const disconnectAll = async (
+	connectedWallets: any[],
+	disconnect: (wallet: DisconnectOptions) => Promise<WalletState[]>,
+) => {
+	await delay(100);
+	for (const label in connectedWallets) {
+		await disconnect({ label: connectedWallets[Number(label)] });
+	}
+};
+
+interface ProviderProps {
+	children: React.ReactNode;
+}
+
+export const ConnectedWalletProvider: React.FC<ProviderProps> = ({
+	children,
+}) => {
+	const [{ wallet, connecting }, connect, disconnect] = useConnectWallet();
+	const connectedWallets = useWallets();
+	const dispatch = useAppDispatch();
+	const [walletInitialized, setWalletInitialized] = useState(false);
+	const [cookie, setCookie, removeCookie] = useCookies();
+	const router = useRouter();
+
+	// set default connected address
+	const [curAddress, setCurAddress] = useState<string | null>();
+
+	const disconnectAll = async (walletArr: any[]) => {
+		await delay(100);
+		for (const label in walletArr) {
+			await disconnect({ label: walletArr[Number(label)] });
+		}
+	};
+
+	useEffect(() => {
+		// let getAddress = localStorage.getItem('curAddress');
+		const getAddress = cookie.curAddress?.value;
+		if (getAddress) {
+			setCurAddress(getAddress);
+		}
+		console.log('first');
+	}, []);
+
+	useEffect(() => {
+		// const prevConnectedWalletsStr =
+		// 	localStorage.getItem(connectedWalletList);
+		const prevConnectedWalletsStr = cookie[connectedWalletList];
+
+		const prevConnectedWallets = prevConnectedWalletsStr
+			? prevConnectedWalletsStr
+			: null;
+
+		autoConnect(prevConnectedWallets, connect, () =>
+			setWalletInitialized(true),
+		);
+		console.log('connect');
+	}, [connect]);
+
+	useEffect(() => {
+		if (!walletInitialized) return;
+		const connectedWalletsLabelArray = connectedWallets.map(
+			({ label }) => label,
+		);
+
+		setCookie(
+			connectedWalletList,
+			JSON.stringify(connectedWalletsLabelArray),
+		);
+
+		// window.localStorage.setItem(
+		// 	connectedWalletList,
+		// 	JSON.stringify(connectedWalletsLabelArray),
+		// );
+		if (connectedWalletsLabelArray.length === 0) {
+			// disconnect wallet set all false
+			dispatch(userSlice.actions.logout());
+			disconnectAll(connectedWalletsLabelArray);
+			removeCookie('curAddress');
+			// setCurAddress(null);
+		} else {
+			setCurAddress(connectedWallets[0].accounts[0].address);
+			setCookie('curAddress', connectedWallets[0].accounts[0].address);
+			// dispatch(userSlice.actions.changeConnectState(true));
+		}
+		console.log('connectedWallets, walletInitialized, connect');
+	}, [connectedWallets, walletInitialized, connect]);
+
+	useEffect(() => {
+		// const accounts = localStorage.getItem(userWalletToken);
+		const accounts = cookie.account;
+		// localStorage.setItem('curAddress', JSON.stringify(curAddress));
+		setCookie('curAddress', curAddress);
+
+		const isSigned = curAddress && cookie[curAddress];
+		// console.log('isSigned', isSigned);
+
+		if (!isSigned) {
+			router.push('/login', { forceOptimisticNavigation: false });
+		} else {
+			router.push('/', { forceOptimisticNavigation: false });
+		}
+
+		// if (accounts) {
+		// 	if (!wallet) return;
+		// 	// switch address in login
+		// 	// 如果accounts 裡面沒有 connected wallet 數據 ，跳到wait sign page
+		// 	const checkSignState = accounts.some((account: IWalletToken) => {
+		// 		return (
+		// 			connectedWallets[0].accounts[0].address ===
+		// 				account.address &&
+		// 			connectedWallets[0].label === account.label
+		// 		);
+		// 	});
+		// 	if (!checkSignState) {
+		// 		// redirect to wait sign page
+		// 		router.push('/login', { forceOptimisticNavigation: false });
+		// 	} else {
+		// 		// dispatch(userSlice.actions.changeSignState(true));
+		// 	}
+		// }
+		console.log('curaddress');
+	}, [curAddress]);
+
+	const isSigned = useMemo(() => {
+		return curAddress && cookie[curAddress];
+	}, [curAddress]);
+
+	return (
+		<ConnectedWalletContext.Provider value={{ isSigned }}>
+			{children}
+		</ConnectedWalletContext.Provider>
+	);
+};
+
+export default function useNetwork() {
+	return useContext(ConnectedWalletContext);
+}
