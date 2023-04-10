@@ -16,6 +16,7 @@ import Tables from 'pages/Table';
 import TablePagination from 'pages/Table/Paginations';
 import ExportToExcel from 'pages/Excel';
 import Swipers from 'pages/Swiper';
+import NavTabs from 'pages/Tabs';
 
 const queryClient = new QueryClient();
 
@@ -41,6 +42,7 @@ function App() {
               </Route>
               <Route path="export_excel" element={<ExportToExcel />} />
               <Route path="swiper" element={<Swipers />} />
+              <Route path="navtabs" element={<NavTabs />} />
             </Routes>
             <Sidebar />
           </QueryClientProvider>
