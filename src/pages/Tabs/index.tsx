@@ -13,7 +13,13 @@ export default function NavTabs() {
       }}
     >
       <TabList>
-        <Tab>Title 1</Tab>
+        <Tab
+          onClick={() => {
+            console.log('1');
+          }}
+        >
+          Title 1
+        </Tab>
         <Tab>Title 2</Tab>
         <Tab>Title 3</Tab>
         <Tab>Title 4</Tab>

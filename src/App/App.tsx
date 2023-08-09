@@ -17,6 +17,7 @@ import TablePagination from 'pages/Table/Paginations';
 import ExportToExcel from 'pages/Excel';
 import Swipers from 'pages/Swiper';
 import NavTabs from 'pages/Tabs';
+import MusicPlayer from 'pages/Audio';
 
 const queryClient = new QueryClient();
 
@@ -43,6 +44,7 @@ function App() {
               <Route path="export_excel" element={<ExportToExcel />} />
               <Route path="swiper" element={<Swipers />} />
               <Route path="navtabs" element={<NavTabs />} />
+              <Route path="player" element={<MusicPlayer />} />
             </Routes>
             <Sidebar />
           </QueryClientProvider>

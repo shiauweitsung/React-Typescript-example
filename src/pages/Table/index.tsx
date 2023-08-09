@@ -3,6 +3,7 @@ import ReactDOM from 'react-dom/client';
 import styles from './styles.module.scss';
 import './index.css';
 import { Outlet } from 'react-router-dom';
+import { TableSelected } from './tableTest';
 
 import {
   createColumnHelper,
@@ -174,6 +175,7 @@ export default function Tables() {
       <button onClick={() => rerender()} className="border p-2">
         Rerender
       </button>
+      <TableSelected />
     </div>
   );
 }
