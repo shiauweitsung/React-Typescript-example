@@ -18,6 +18,7 @@ import ExportToExcel from 'pages/Excel';
 import Swipers from 'pages/Swiper';
 import NavTabs from 'pages/Tabs';
 import MusicPlayer from 'pages/Audio';
+import Card from 'pages/Card';
 
 const queryClient = new QueryClient();
 
@@ -45,6 +46,7 @@ function App() {
               <Route path="swiper" element={<Swipers />} />
               <Route path="navtabs" element={<NavTabs />} />
               <Route path="player" element={<MusicPlayer />} />
+              <Route path="card" element={<Card />} />
             </Routes>
             <Sidebar />
           </QueryClientProvider>

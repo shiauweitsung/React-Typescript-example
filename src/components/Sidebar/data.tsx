@@ -85,6 +85,11 @@ export const sidebarData: ISidebarData[] = [
     link: '/player',
     icon: <ChatSvg />,
   },
+  {
+    label: 'Card',
+    link: '/card',
+    icon: <ChatSvg />,
+  },
 ];
 
 export default sidebarData;

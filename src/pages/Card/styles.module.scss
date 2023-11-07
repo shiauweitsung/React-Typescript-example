@@ -1,0 +1,40 @@
+.root {
+  max-width: 900px;
+  width: 100%;
+  padding: 16px;
+  border: 1px solid gray;
+
+  .wrapper {
+    display: flex;
+    flex-wrap: wrap;
+    box-sizing: border-box;
+    gap: 12px;
+  }
+
+  .card {
+    border: 1px solid pink;
+    display: flex;
+    flex-basis: calc(33.33% - 24px);
+    width: calc(33.33% - 24px);
+    max-width: 300px;
+    box-sizing: border-box;
+    padding: 12px 16px;
+    margin-bottom: 12px;
+    margin-left: 6px;
+    margin-right: 6px;
+
+    .tags {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 4px;
+
+      .tag {
+        display: flex;
+        align-items: center;
+        padding: 4px 8px;
+        border: 1px solid salmon;
+        border-radius: 10px;
+      }
+    }
+  }
+}
